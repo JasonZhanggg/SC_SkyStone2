@@ -52,7 +52,7 @@ public class SkystoneHardware {
     public DcMotor arm = null;
     public Servo rotation_servo = null;
     public NormalizedColorSensor colorSensor = null;
-    public ModernRoboticsI2cRangeSensor rangeSensor;
+    public ModernRoboticsI2cRangeSensor rangeSensorL,rangeSensorR;
     public DigitalChannel touchSensor;  // Hardware Device Object
     public DigitalChannel touchSensorLift;  // Hardware Device Object
     public ModernRoboticsTouchSensor touchFlipper2;
@@ -80,7 +80,8 @@ public class SkystoneHardware {
         rightFoundationClaw = hwMap.get(Servo.class, "rightFoundationClaw");
         leftFoundationClaw = hwMap.get(Servo.class, "leftFoundationClaw");
 
-        rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "range");
+        rangeSensorL = hwMap.get(ModernRoboticsI2cRangeSensor.class, "rangel");
+        rangeSensorR = hwMap.get(ModernRoboticsI2cRangeSensor.class, "ranger");
         touchSensor = hwMap.get(DigitalChannel.class, "touch");
         touchSensorLift = hwMap.get(DigitalChannel.class, "touchLift");
         leftClamp = hwMap.get(Servo.class, "leftClamp");
