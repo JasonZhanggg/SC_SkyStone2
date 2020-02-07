@@ -1,4 +1,4 @@
-/* Copyright (c) 2019 FIRST. All rights reserved.
+/* Copyright (c) 2017 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided that
@@ -29,32 +29,68 @@
 
 package org.firstinspires.ftc.teamcode;
 
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name = "Test", group = "test")
+@TeleOp(name = "TestTeleOp", group = "Pushbot")
 //@Disabled
-public class test extends LinearOpMode {
+public class TestTeleOp extends LinearOpMode {
 
     SkystoneHardware robot = new SkystoneHardware();
 
     @Override
     public void runOpMode() {
+        robot.init(hardwareMap, this, "teleop");
+        telemetry.addData("Say", "Hello Tester");
+        telemetry.update();
+
         waitForStart();
-        robot.init(hardwareMap, this, "autonomous");
-        // test flippter motor
-        robot.flipperMotor.setPower(0.2);
 
-/*
-        // Test BLUE side foundation move
-        robot.encoderDriveStrafe45(0.4, 30, "q4", 5);
-        robot.encoderDrive(0.4, 0.4,25, -25, 5);  // counter clock wise turn
+        while (opModeIsActive()) {
+            /*
+            float js_power = -gamepad1.left_stick_y;
 
-        // Test RED side foundation move
-        robot.encoderDriveStrafe45(0.4, 30, "q3", 5);
-        robot.encoderDrive(0.4, 0.4,-25, 25, 5); // clock wise turn
-*/
+            telemetry.addData("JoyStick: ", js_power);
+            telemetry.update();
+
+            if(!robot.touchFlipper1.getState() && js_power < 0.0) {
+                robot.flipperMotor.setPower(0);
+            }else if(!robot.touchFlipper2.getState() && js_power > 0.0) {
+                robot.flipperMotor.setPower(0);
+            }else{
+                robot.flipperMotor.setPower(js_power*0.45);
+            }
+            */
+            if (gamepad1.left_trigger > 0.4 ) {
+                if(!robot.touchFlipper2.getState()){
+                    robot.flipperMotor.setPower(0);
+                }else {
+                    robot.flipperMotor.setPower(0.45);
+                }
+            } else if (gamepad1.right_trigger > 0.4) {
+                if(!robot.touchFlipper1.getState()){
+                    robot.flipperMotor.setPower(0);
+                }else {
+                    robot.flipperMotor.setPower(-0.3);
+                }
+            } else {
+                robot.flipperMotor.setPower(0);
+            }
+
+            // open
+            if (gamepad1.a) {
+                robot.leftClamp.setPosition(0.02);
+                robot.rightClamp.setPosition(0.2);
+
+            }
+            //close
+            else if (gamepad1.b) {
+                robot.leftClamp.setPosition(0.13);
+                robot.rightClamp.setPosition(0.07);
+
+            }
+        }
     }
 }

@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 @Autonomous(name = "blueSide", group = "Concept")
@@ -25,8 +28,8 @@ public class closeNoFoundationBlueWebCam extends LinearOpMode {
         sleep(600);
         robot.arm.setPower(0);
         //open the claws
-        robot.claw1.setPosition(0.7);
-        robot.claw2.setPosition(0.3);
+        robot.claw1.setPosition(0.78);
+        robot.claw2.setPosition(0.19);
         sleep(700);
         //get the skystone's position
         int blocknum = detector.getSkystone();
@@ -42,13 +45,24 @@ public class closeNoFoundationBlueWebCam extends LinearOpMode {
         } else {
             robot.encoderDriveStrafe(0.5, 2, "right", 0.7);
         }
+        robot.encoderDrive(0.4, 0.4, -18, -18, 10);
+        double l = robot.rangeSensorL.getDistance(DistanceUnit.CM);
+        double r = robot.rangeSensorR.getDistance(DistanceUnit.CM);
+
+        while(l>6.0&&r>6.0){
+            l = robot.rangeSensorL.getDistance(DistanceUnit.CM);
+            r = robot.rangeSensorR.getDistance(DistanceUnit.CM);
+            robot.setDriveRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.setDrivePower(-0.2);
+        }
+        robot.setDrivePower(0);
         //drive forward to the skystone, pick it up, raise the arm partially, and lock the arm
-        robot.encoderDrive(0.4, 0.4,-28, -28, 2.2);
-        robot.claw1.setPosition(0.35);
+        //robot.encoderDrive(0.4, 0.4,-28, -28, 2.2);
+        robot.claw1.setPosition(0.45);
         sleep(600);
         robot.arm.setPower(0.4);
         sleep(250);
-        robot.arm.setPower(0.15);
+        robot.arm.setPower(0.1);
         //back up
         robot.encoderDrive(0.4, 0.4,9, 9, 12);
         //turn 90 degrees
@@ -74,9 +88,8 @@ public class closeNoFoundationBlueWebCam extends LinearOpMode {
         //open the claw
         robot.claw1.setPosition(0.7);
         //flip claw back up
-        while (robot.touchSensor.getState()) {
-            robot.arm.setPower(0.4);
-        }
+        robot.arm.setPower(0.4);
+        sleep(600);
         robot.arm.setPower(0);
 
         //move back

@@ -5,7 +5,6 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -19,12 +18,6 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 public class SkystoneHardware {
     /* Public OpMode members. */
-    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
-    private static final String LABEL_FIRST_ELEMENT = "Stone";
-    private static final String LABEL_SECOND_ELEMENT = "Skystone";
-
-    private static final String VUFORIA_KEY =
-            "AXx1coP/////AAAAGR5+EbHI40Yxm9qZuu+1B24qD4W8rX1Mpr3bUfT5zyb1j8gA4EQSLVMVxsL42LqB8fa6x/dQxnRpoAYen7mztKaCwY706bIMXjW/1n7YZHJ+/v4ZlzL39Bk5NHHMOvWrZ2nzRz2aE3ZM7dfUQFyOr0hIl5/cfmnSQ+MWUDJWynCWpinkTc8/CaHLh9f7O+jLy1zPzrS9nDJSj7GUXDRGS5+Aeh/Wwv0wvmfdz8ZdPA1zA0iXF1KqvfkjmMv25F15ikWX7/+XuwXlvHIEw1vruo9zbCaQcmgqve05tldl1y9aiMcdVeEJUrQLhdYA2ct8aKpqRIs6MXaw4otzbED5Zn93a4Wn0kcLBRUOQ0OJ6li0";
 
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
@@ -39,10 +32,10 @@ public class SkystoneHardware {
     public DcMotor rightDriveBack = null;
     public DcMotor leftDriveBack = null;
     public DcMotor rightDriveFront = null;
+    public DcMotor flipperMotor = null;
     public Servo claw1 = null;
     public Servo claw2 = null;
-    public Servo leftPusher = null;
-    public Servo rightPusher = null;
+
     public Servo rightFoundationClaw = null;
     public Servo leftFoundationClaw = null;
     public Servo leftClamp = null;
@@ -55,7 +48,7 @@ public class SkystoneHardware {
     public ModernRoboticsI2cRangeSensor rangeSensorL,rangeSensorR;
     public DigitalChannel touchSensor;  // Hardware Device Object
     public DigitalChannel touchSensorLift;  // Hardware Device Object
-    public ModernRoboticsTouchSensor touchFlipper2;
+    public DigitalChannel touchFlipper1, touchFlipper2;
 
 
     ElapsedTime runtime = new ElapsedTime();
@@ -69,14 +62,16 @@ public class SkystoneHardware {
         hwMap = ahwMap;
         //arm = hwMap.get(DcMotor.class, "arm");
 
-        leftDriveFront = hwMap.get(DcMotor.class, "leftf");
+        leftDriveFront  = hwMap.get(DcMotor.class, "leftf");
         rightDriveFront = hwMap.get(DcMotor.class, "rightf");
-        leftDriveBack = hwMap.get(DcMotor.class, "leftb");
-        rightDriveBack = hwMap.get(DcMotor.class, "rightb");
+        leftDriveBack   = hwMap.get(DcMotor.class, "leftb");
+        rightDriveBack  = hwMap.get(DcMotor.class, "rightb");
+        flipperMotor    = hwMap.get(DcMotor.class, "flipper_motor");
+
         arm = hwMap.get(DcMotor.class, "arm");
         lift = hwMap.get(DcMotor.class, "lift");
-        claw1 = hwMap.get(Servo.class, "claw1");
-        claw2 = hwMap.get(Servo.class, "claw2");
+        claw1 = hwMap.get(Servo.class, "claw1"); // right
+        claw2 = hwMap.get(Servo.class, "claw2"); // left
         rightFoundationClaw = hwMap.get(Servo.class, "rightFoundationClaw");
         leftFoundationClaw = hwMap.get(Servo.class, "leftFoundationClaw");
 
@@ -89,7 +84,9 @@ public class SkystoneHardware {
         rotation_servo = hwMap.get(Servo.class, "rotation_servo");
         colorSensor = hwMap.get(NormalizedColorSensor.class, "sensor_color");
 
-        touchFlipper2 = hwMap.get(ModernRoboticsTouchSensor.class, "touchFlipper2");
+        // 1 is the front, 2 is the back
+        touchFlipper1 = hwMap.get(DigitalChannel.class, "touchFlipper1");
+        touchFlipper2 = hwMap.get(DigitalChannel.class, "touchFlipper2");
 
         leftDriveBack.setDirection(DcMotor.Direction.FORWARD);
         leftDriveFront.setDirection(DcMotor.Direction.FORWARD);
@@ -101,6 +98,7 @@ public class SkystoneHardware {
         rightDriveFront.setPower(0);
         leftDriveBack.setPower(0);
         rightDriveBack.setPower(0);
+        flipperMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if (runeMode.equals("teleop")) {
             setDriveRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         } else if (runeMode.equals("autonomous")) {
