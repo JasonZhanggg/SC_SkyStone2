@@ -61,6 +61,11 @@ public class SkystoneTeleop extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            /*
+            *
+            * DRIVING (GAMEPAD 1)
+            *
+            * */
             if (gamepad1.b) {
                 speed = 0.3;
             } else if (gamepad1.a) {
@@ -68,6 +73,12 @@ public class SkystoneTeleop extends LinearOpMode {
             } else if (gamepad1.dpad_down) {
                 speed = 0.15;
             }
+            /*
+             *
+             * ARM (GAMEPAD 2)
+             *
+             * */
+
             //close
             if (gamepad2.x) {
                 robot.claw1.setPosition(0.35);
@@ -78,31 +89,40 @@ public class SkystoneTeleop extends LinearOpMode {
                 robot.claw1.setPosition(0.75);
                 robot.claw2.setPosition(0.25);
             }
+            //lift arm up
             if (gamepad2.right_stick_y > 0.6 && armFlag) {
                 robot.arm.setPower(-0.4);
                 flipArmFlag = true;
-            } else if (gamepad2.right_stick_y < -0.6 && armFlag) {
+            }
+            //Flip arm down
+            else if (gamepad2.right_stick_y < -0.6 && armFlag) {
                 robot.arm.setPower(0.4);
                 flipArmFlag = true;
             } else if (armFlag && flipArmFlag) {
                 robot.arm.setPower(0);
             }
 
+            //lock the flip arm
             if (gamepad2.left_stick_x > 0.8) {
                 flag = false;
                 robot.lift.setPower(-0.1);
-
             }
-
-            if (gamepad2.left_stick_y > 0.6 && robot.touchSensorLift.getState()) {
+            //lift arm
+            else if (gamepad2.left_stick_y > 0.6 && robot.touchSensorLift.getState()) {
                 flag = true;
                 robot.lift.setPower(0.2);
-            } else if (gamepad2.left_stick_y < -0.6) {
+            }else if(robot.touchSensorLift.getState()){
+                robot.lift.setPower(0);
+            }
+            else if (gamepad2.left_stick_y < -0.6) {
                 flag = true;
                 robot.lift.setPower(-0.55);
             } else if (flag) {
-                robot.lift.setPower(0);
+                robot.lift.setPower(-0.1);
             }
+
+            //
+
             if (gamepad2.left_trigger > 0.4) {
                 spinValue = 0;
 
@@ -149,7 +169,7 @@ public class SkystoneTeleop extends LinearOpMode {
 
                 robot.leftClamp.setPosition(0);
                 robot.rightClamp.setPosition(0.2);
-                robot.arm.setPower(0.4);
+                robot.arm.setPower(-0.4);
                 armFlag = false;
             }
             if (gamepad1.y) {

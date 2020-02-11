@@ -2,7 +2,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -38,6 +37,7 @@ public class SkystoneHardware {
 
     public Servo rightFoundationClaw = null;
     public Servo leftFoundationClaw = null;
+    public Servo backFoundationClaw = null;
     public Servo leftClamp = null;
     public Servo rightClamp = null;
     public DcMotor lift = null;
@@ -74,6 +74,7 @@ public class SkystoneHardware {
         claw2 = hwMap.get(Servo.class, "claw2"); // left
         rightFoundationClaw = hwMap.get(Servo.class, "rightFoundationClaw");
         leftFoundationClaw = hwMap.get(Servo.class, "leftFoundationClaw");
+        backFoundationClaw = hwMap.get(Servo.class, "backFoundationClaw");
 
         rangeSensorL = hwMap.get(ModernRoboticsI2cRangeSensor.class, "rangel");
         rangeSensorR = hwMap.get(ModernRoboticsI2cRangeSensor.class, "ranger");
@@ -264,6 +265,7 @@ public class SkystoneHardware {
         setDrivePower(0);
     }
 
+
 /*  Direction for diagonal movement (45 degree)
     q2 | q1
     -- + --
@@ -348,6 +350,47 @@ public class SkystoneHardware {
 
         }
 
+    }
+
+
+    public void closeIntakeClaw(){
+        claw1.setPosition(0.45);
+        claw2.setPosition(0.5);
+    }
+    public void openIntakeClaw(){
+        claw1.setPosition(0.75);
+        claw2.setPosition(0.21);
+    }
+    public void releaseIntakeClaw(){
+        claw1.setPosition(0.53);
+        claw2.setPosition(0.43);
+    }
+    public void openFlipperClaw()
+    {
+        leftClamp.setPosition(0.01);
+        rightClamp.setPosition(0.21);
+    }
+    public void closeFlipperClaw()
+    {
+        leftClamp.setPosition(0.13);
+        rightClamp.setPosition(0.07);
+    }
+    public void frontFoundationClawUp()
+    {
+        rightFoundationClaw.setPosition(0.95);
+        leftFoundationClaw.setPosition(0.8);
+    }
+    public void frontFoundationClawDown()
+    {
+        rightFoundationClaw.setPosition(0.8);
+        leftFoundationClaw.setPosition(0.95);
+    }
+    public void backFoundationClawUp()
+    {
+        backFoundationClaw.setPosition(0.1);
+    }
+    public void backFoundationClawDown() {
+        backFoundationClaw.setPosition(0.3);
     }
 }
 

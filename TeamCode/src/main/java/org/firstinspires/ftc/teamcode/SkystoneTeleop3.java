@@ -36,9 +36,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
-@TeleOp(name = "MecDrive2", group = "Pushbot")
+@TeleOp(name = "MecDrive3", group = "Pushbot")
 //@Disabled
-public class SkystoneTeleop2 extends LinearOpMode {
+public class SkystoneTeleop3 extends LinearOpMode {
 
     SkystoneHardware robot = new SkystoneHardware();
     double ch3 = 0;
@@ -53,16 +53,15 @@ public class SkystoneTeleop2 extends LinearOpMode {
         telemetry.addData("Say", "Hello Driver");
         telemetry.update();
         boolean flag = true; //lift flag
-        boolean armFlag = true; //arm flag
         int timerFlag = 1;
         boolean flipArmFlag = true; //flip arm flag
         boolean rangeFlag = false;
-        double l=0,r=0; // front range sensors reading
+        double l = 0, r = 0; // front range sensors reading
 
         waitForStart();
 
         while (opModeIsActive()) {
-            // Control speed
+            // ### Control speed
             if (gamepad1.b) {
                 speed = 0.3;
             } else if (gamepad1.a) {
@@ -71,103 +70,83 @@ public class SkystoneTeleop2 extends LinearOpMode {
                 speed = 0.15;
             }
 
-            // Close the intake claw
+            // ### Open/close the intake claw
             if (gamepad2.x) {
-                robot.claw1.setPosition(0.45);
-                robot.claw2.setPosition(0.5);
+                robot.closeIntakeClaw();
             }
-            // Open the intake claw
             if (gamepad2.y) {
-                robot.claw1.setPosition(0.75);
-                robot.claw2.setPosition(0.21);
+                robot.openIntakeClaw();
             }
-            // Rotate the intake claw
-            if (gamepad2.right_stick_y > 0.6 && armFlag) {
+
+            // ###  Control (flip) the intake arm
+            if (gamepad2.right_stick_y > 0.6) {
                 robot.arm.setPower(-0.4);
+                timerFlag = 1;  // reset timerFlag so we can start it over again
                 flipArmFlag = true;
-                timerFlag = 1;
-            } else if (gamepad2.right_stick_y < -0.6 && armFlag) {
+            } else if (gamepad2.right_stick_y < -0.6) {
                 robot.arm.setPower(0.4);
                 flipArmFlag = true;
-            } else if (armFlag && flipArmFlag) {
+            } else if (flipArmFlag) {
                 robot.arm.setPower(0);
             }
 
-            // Control lift slider
-            if (gamepad2.left_stick_x > 0.8) {
-                flag = false;
-                robot.lift.setPower(-0.1);
-            }
+            // ### Control (move up and down) lift slider
+
             if (gamepad2.left_stick_y > 0.6 && robot.touchSensorLift.getState()) {
-                flag = true;
                 robot.lift.setPower(0.2);
-            } else if (gamepad2.left_stick_y < -0.6) {
-                flag = true;
+            }
+            else if (gamepad2.left_stick_y < -0.6) {
                 robot.lift.setPower(-0.55);
-            } else if (flag) {
+            }
+            else if (!robot.touchSensorLift.getState()) {
                 robot.lift.setPower(0);
             }
-
-            // Control the back Flipper Motor
+            else {
+                robot.lift.setPower(-0.1);
+            }
+            // ### Control (rotate) the back Flipper Motor
             // Game pad 2 left trigger flippers backward (place the stone on the foundation), use more power
             // Game pad 2 right trigger flippers forward (return to the position to pick up the stone), use less power
             // touchFlipper1 (the front touch sensor)
             // touchFlipper2 (the back touch sensor)
-            if (gamepad2.right_trigger > 0.4 ) {
-                if(!robot.touchFlipper2.getState()){
+            if (gamepad2.right_trigger > 0.4) {
+                if (!robot.touchFlipper2.getState()) {
                     robot.flipperMotor.setPower(0);
-                }else {
+                } else {
                     robot.flipperMotor.setPower(0.45);
                 }
             } else if (gamepad2.left_trigger > 0.4) {
-                if(!robot.touchFlipper1.getState()){
+                if (!robot.touchFlipper1.getState()) {
                     robot.flipperMotor.setPower(0);
-                }else {
+                } else {
                     robot.flipperMotor.setPower(-0.3);
                 }
             } else {
                 robot.flipperMotor.setPower(0);
             }
 
-            // Open the flipper claw (back)
+            // ### Open/close the flipper claw (back)
             if (gamepad2.a) {
-                robot.leftClamp.setPosition(0.02);
-                robot.rightClamp.setPosition(0.2);
-            }
-            // Close the flipper claw (back)
-            else if (gamepad2.b) {
-                robot.leftClamp.setPosition(0.13);
-                robot.rightClamp.setPosition(0.07);
+                robot.openFlipperClaw();
+            } else if (gamepad2.b) {
+                robot.closeFlipperClaw();
             }
 
-            // Intake touch sensor (front) pressed, let's do some magics to make it easy for the driver
-            if (!robot.touchSensor.getState()) {
-                armFlag = true;
+            // ### Intake touch sensor (front) pressed, let's do some magics to make it easy for the driver
+            // timerFlag:
+            //  1 = init state
+            //  2 = intake arm flipped
+            //  3 = claw closed
+            if (!robot.touchSensor.getState() && timerFlag == 1) {
                 robot.arm.setPower(0);
-                robot.claw1.setPosition(0.6);
-                robot.claw2.setPosition(0.35);
-                if (timerFlag == 1) {
-                    flipTimer.reset();
-                    flipTimer.startTime();
-                    timerFlag = 2;
-                }
+                robot.releaseIntakeClaw();
+                flipTimer.reset();
+                flipTimer.startTime();
+                timerFlag = 2;
             }
-            //1 == first enter
-            //2 == entered
-            //3 == finished
-            //not pressed
-            if (flipTimer.time() > 0.5 && flipTimer.time()<0.55 && timerFlag == 2) {
-                robot.leftClamp.setPosition(0.13);
-                robot.rightClamp.setPosition(0.07);
+            if (flipTimer.time() > 0.2 && flipTimer.time() < 0.3 && timerFlag == 2) {
+                robot.closeFlipperClaw();
                 timerFlag = 3;
-            }
-
-            if (gamepad2.left_bumper) {
-                robot.leftClamp.setPosition(0.02);
-                robot.rightClamp.setPosition(0.2);
-                robot.arm.setPower(0.3);
-                timerFlag = 1;
-               // armFlag = false;
             }
 
             // Hold the arm
@@ -175,38 +154,30 @@ public class SkystoneTeleop2 extends LinearOpMode {
                 robot.arm.setPower(0.1);
                 flipArmFlag = false;
             }
-            telemetry.addData("timerFlag:", timerFlag);
-            telemetry.addData("armFlag:", armFlag);
-            telemetry.addData("flipArmFlag:", flipArmFlag);
 
-            // More magics that use range sensors to scan the stone and auto grab it
+            // ### Use range sensors to scan the stone and auto grab it
             // Game pad 1 right trigger to enable auto scan and left trigger to disable it
-            if(rangeFlag) {
+            if (rangeFlag) {
                 l = robot.rangeSensorL.getDistance(DistanceUnit.CM);
                 r = robot.rangeSensorR.getDistance(DistanceUnit.CM);
                 telemetry.addData("L cm", (int) l);
                 telemetry.addData("R cm", (int) r);
             }
-
-            if(gamepad1.left_trigger>0.6){
+            if (gamepad1.left_trigger > 0.6) {
                 rangeFlag = false;
-            }
-            else if(gamepad1.right_trigger>0.6){
-                // should we
+            } else if (gamepad1.right_trigger > 0.6) {
                 rangeFlag = true;
             }
-            if (l>5.0 && l<9.0 && r>5.0 && r<9.0 && rangeFlag){
+            if (l > 5.0 && l < 9.0 && r > 5.0 && r < 9.0 && rangeFlag) {
                 telemetry.addData("Status:", "Locked");
-                robot.claw1.setPosition(0.35);
-                robot.claw2.setPosition(0.6);
-
-            }else{
+                robot.closeIntakeClaw();
+            } else {
                 telemetry.addData("Status:", "Free");
             }
             telemetry.addData("Scan:", rangeFlag);
             telemetry.update();
 
-            // Drive the robot
+            // ### Drive the robot
             ch3 = gamepad1.left_stick_y > 0.4 ? -0.9 : gamepad1.left_stick_y < -0.4 ? 0.9 : 0;
             ch4 = gamepad1.right_bumper ? 0.9 : gamepad1.left_bumper ? -0.9 : 0;
             ch1 = gamepad1.right_stick_x > 0.4 ? 0.6 : gamepad1.right_stick_x < -0.4 ? -0.6 : 0;
@@ -215,13 +186,16 @@ public class SkystoneTeleop2 extends LinearOpMode {
             robot.rightDriveFront.setPower((ch3 - ch1 - ch4) * speed);
             robot.rightDriveBack.setPower((ch3 - ch1 + ch4) * speed);
 
-            // Control foundation claws
-            if (gamepad1.y) {
-                robot.rightFoundationClaw.setPosition(0.95);
-                robot.leftFoundationClaw.setPosition(0.8);
-            } else if (gamepad1.x) {
-                robot.rightFoundationClaw.setPosition(0.8);
-                robot.leftFoundationClaw.setPosition(0.95);
+            // ### Control foundation claws
+            //if (gamepad1.y) {
+            //   robot.frontFoundationClawUp();
+            //} else if (gamepad1.x) {
+            //     robot.frontFoundationClawDown();
+            // }
+            if (gamepad1.x) {
+                robot.backFoundationClawDown();
+            } else if (gamepad1.y) {
+                robot.backFoundationClawUp();
             }
         }
     }

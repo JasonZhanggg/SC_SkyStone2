@@ -44,8 +44,12 @@ public class test extends LinearOpMode {
     public void runOpMode() {
         waitForStart();
         robot.init(hardwareMap, this, "autonomous");
-        // test flippter motor
-        robot.flipperMotor.setPower(0.2);
+
+        robot.encoderDriveStrafe(0.8, 90, "left", 5);
+
+        sleep (5000);
+
+        robot.encoderDriveStrafe(0.8, 90, "right", 5);
 
 /*
         // Test BLUE side foundation move
