@@ -72,7 +72,7 @@ public class SkystoneTeleop3 extends LinearOpMode {
 
             // ### Open/close the intake claw
             if (gamepad2.x) {
-                robot.closeIntakeClaw();
+                robot.closeIntakeClaw(3);
             }
             if (gamepad2.y) {
                 robot.openIntakeClaw();
@@ -170,7 +170,7 @@ public class SkystoneTeleop3 extends LinearOpMode {
             }
             if (l > 5.0 && l < 9.0 && r > 5.0 && r < 9.0 && rangeFlag) {
                 telemetry.addData("Status:", "Locked");
-                robot.closeIntakeClaw();
+                robot.closeIntakeClaw(3);
             } else {
                 telemetry.addData("Status:", "Free");
             }

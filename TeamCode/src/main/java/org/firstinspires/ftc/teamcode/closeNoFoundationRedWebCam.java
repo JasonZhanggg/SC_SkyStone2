@@ -51,82 +51,34 @@ public class closeNoFoundationRedWebCam extends LinearOpMode {
     SkystoneHardware robot = new SkystoneHardware();
     SkystoneDetector detector = new SkystoneDetector();
 
+    int extra = 0;
+    int pos = 1; //use the left claw
     @Override
     public void runOpMode() {
-        ElapsedTime time = new ElapsedTime();
+        //init the hardware map and the skystone detection
         robot.init(hardwareMap, this, "autonomous");
         detector.init(hardwareMap, this);
         //wait for start
         waitForStart();
-        //flip the arm down
-        robot.arm.setPower(-0.4);
-        sleep(600);
-        robot.arm.setPower(0);
-        //open the claws
-        robot.claw1.setPosition(0.7);
-        robot.claw2.setPosition(0.3);
-        sleep(700);
-        //get the skystone's position
-        int blocknum = detector.getSkystone();
-        telemetry.addData("Block: ", blocknum);
-        telemetry.update();
+        robot.openIntakeClaw();
+        int blockNum = detector.getSkystone();
 
-        if (blocknum == 1) {
+        if (blockNum == 1) {
             robot.encoderDriveStrafe(0.5, 9, "left", 1.5);
-        } else if (blocknum == 2) {
+        } else if (blockNum == 2) {
             robot.encoderDriveStrafe(0.5, 3, "left", 0.7);
 
         } else {
             robot.encoderDriveStrafe(0.5, 7, "right", 0.7);
         }
-        robot.encoderDrive(0.4,0.4  , -28, -28, 2.2);
-        robot.claw2.setPosition(0.6);
-        sleep(600);
-        robot.arm.setPower(0.4);
-        sleep(250);
-        robot.arm.setPower(0.15);
-        //back up
-        robot.encoderDrive(0.5, 0.4,9, 9, 12);
-        //turn 90 degrees
-        robot.encoderDrive(0.5, 0.4,-23, 23, 10);
-        //drive to the foundation
-        robot.driveToLine(false);
-        robot.encoderDrive(0.5, 0.5,-40, -40, 10);
-        //turn 90 degrees
-        robot.encoderDrive(0.5, 0.4,22, -22, 10);
-        //open the foundation claw and drive into the foundation
-        robot.leftFoundationClaw.setPosition(0.8);
-        robot.rightFoundationClaw.setPosition(0.95);
-        robot.encoderDrive(0.3, 0.3,-15, -15, 10);
-        //close the foundation claw
-        robot.leftFoundationClaw.setPosition(0.95);
-        robot.rightFoundationClaw.setPosition(0.8);
-        //flip the arm down
-        sleep(300);
-        robot.arm.setPower(-0.4);
-        sleep(200);
-        robot.arm.setPower(0);
-        sleep(300);
-        //open the claw
-        robot.claw2.setPosition(0.3);
-        //flip claw back up
-        while (robot.touchSensor.getState()) {
-            robot.arm.setPower(0.4);
-        }
-        robot.arm.setPower(0);
-        //move back
-        robot.encoderDrive(0.4, 0.4,5, 5, 0.5);
-        //turn a little so the foundation does not hit the wall
-        robot.encoderDriveStrafe45(0.4, 30, "q3", 5);
-        robot.encoderDrive(0.4, 0.4,-25, 25, 5); // clock wise turn
-
-        robot.leftFoundationClaw.setPosition(0.8);
-        robot.rightFoundationClaw.setPosition(0.95);
-        sleep(600);
-        //drive into the foundation to line it with the wall and to make the robot straight
-        robot.encoderDrive(0.4, 0.4,-20, -20, 2);
-        //back up onto the line
-        robot.encoderDrive(0.4, 0.4,45, 45, 4);
+        robot.grabStone(pos, 27, 8);
+        robot.encoderDriveStrafe(0.8, 65+extra,"right",  10);
+        robot.dropStone(5, 5);
+        robot.encoderDriveStrafe(0.8, 90+extra,"left",  10);
+        robot.grabStone(pos, 12, 9);
+        robot.encoderDriveStrafe(0.8, 100+extra,"right",  10);
+        robot.dropStone(5, 0);
+        robot.moveFoundation("red");
     }
 
 }

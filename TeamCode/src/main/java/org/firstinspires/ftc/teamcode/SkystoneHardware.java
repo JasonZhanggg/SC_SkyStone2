@@ -45,7 +45,7 @@ public class SkystoneHardware {
     public DcMotor arm = null;
     public Servo rotation_servo = null;
     public NormalizedColorSensor colorSensor = null;
-    public ModernRoboticsI2cRangeSensor rangeSensorL,rangeSensorR;
+    public ModernRoboticsI2cRangeSensor rangeSensorL, rangeSensorR;
     public DigitalChannel touchSensor;  // Hardware Device Object
     public DigitalChannel touchSensorLift;  // Hardware Device Object
     public DigitalChannel touchFlipper1, touchFlipper2;
@@ -62,11 +62,11 @@ public class SkystoneHardware {
         hwMap = ahwMap;
         //arm = hwMap.get(DcMotor.class, "arm");
 
-        leftDriveFront  = hwMap.get(DcMotor.class, "leftf");
+        leftDriveFront = hwMap.get(DcMotor.class, "leftf");
         rightDriveFront = hwMap.get(DcMotor.class, "rightf");
-        leftDriveBack   = hwMap.get(DcMotor.class, "leftb");
-        rightDriveBack  = hwMap.get(DcMotor.class, "rightb");
-        flipperMotor    = hwMap.get(DcMotor.class, "flipper_motor");
+        leftDriveBack = hwMap.get(DcMotor.class, "leftb");
+        rightDriveBack = hwMap.get(DcMotor.class, "rightb");
+        flipperMotor = hwMap.get(DcMotor.class, "flipper_motor");
 
         arm = hwMap.get(DcMotor.class, "arm");
         lift = hwMap.get(DcMotor.class, "lift");
@@ -89,10 +89,10 @@ public class SkystoneHardware {
         touchFlipper1 = hwMap.get(DigitalChannel.class, "touchFlipper1");
         touchFlipper2 = hwMap.get(DigitalChannel.class, "touchFlipper2");
 
-        leftDriveBack.setDirection(DcMotor.Direction.FORWARD);
-        leftDriveFront.setDirection(DcMotor.Direction.FORWARD);
-        rightDriveBack.setDirection(DcMotor.Direction.REVERSE);
-        rightDriveFront.setDirection(DcMotor.Direction.REVERSE);
+        leftDriveBack.setDirection(DcMotor.Direction.REVERSE);
+        leftDriveFront.setDirection(DcMotor.Direction.REVERSE);
+        rightDriveBack.setDirection(DcMotor.Direction.FORWARD);
+        rightDriveFront.setDirection(DcMotor.Direction.FORWARD);
         //arm.setDirection(DcMotor.Direction.FORWARD);
         //arm.setPower(0);
         leftDriveFront.setPower(0);
@@ -148,7 +148,7 @@ public class SkystoneHardware {
             rightDriveBack.setPower(Math.abs(speedRight));
             while (op_mode.opModeIsActive() &&
                     (leftDriveBack.isBusy() && rightDriveBack.isBusy() &&
-                            leftDriveFront.isBusy() && rightDriveFront.isBusy()) && runtime.time()<timeoutS) {
+                            leftDriveFront.isBusy() && rightDriveFront.isBusy()) && runtime.time() < timeoutS) {
 
                 // Display it for the driver.
                 op_mode.telemetry.addData("Path_1", "Running to %7d :%7d: %7d :%7d",
@@ -212,7 +212,7 @@ public class SkystoneHardware {
             runtime.startTime();
             while (op_mode.opModeIsActive() &&
                     (leftDriveBack.isBusy() && rightDriveBack.isBusy() &&
-                            leftDriveFront.isBusy() && rightDriveFront.isBusy()) && runtime.time()<timeoutS) {
+                            leftDriveFront.isBusy() && rightDriveFront.isBusy()) && runtime.time() < timeoutS) {
 
                 // Display it for the driver.
                 op_mode.telemetry.addData("Path_1", "Running to %7d :%7d: %7d :%7d",
@@ -229,10 +229,10 @@ public class SkystoneHardware {
             runtime.reset();
             setDrivePower(0);
 
-            leftDriveBack.setDirection(DcMotor.Direction.FORWARD);
-            leftDriveFront.setDirection(DcMotor.Direction.FORWARD);
-            rightDriveBack.setDirection(DcMotor.Direction.REVERSE);
-            rightDriveFront.setDirection(DcMotor.Direction.REVERSE);
+            leftDriveBack.setDirection(DcMotor.Direction.REVERSE);
+            leftDriveFront.setDirection(DcMotor.Direction.REVERSE);
+            rightDriveBack.setDirection(DcMotor.Direction.FORWARD);
+            rightDriveFront.setDirection(DcMotor.Direction.FORWARD);
 
         }
 
@@ -244,6 +244,7 @@ public class SkystoneHardware {
         rightDriveFront.setPower(Math.abs(power));
         rightDriveBack.setPower(Math.abs(power));
     }
+
     public void driveToLine(boolean colorBlue) {
         if (colorSensor instanceof SwitchableLight) {
             ((SwitchableLight) colorSensor).enableLight(true);
@@ -252,7 +253,7 @@ public class SkystoneHardware {
         setDrivePower(0.5);
         while (true) {
             NormalizedRGBA colors = colorSensor.getNormalizedColors();
-            if (colors.blue > 0.75 && colorBlue || colors.red>0.75 && !colorBlue) {
+            if (colors.blue > 0.75 && colorBlue || colors.red > 0.75 && !colorBlue) {
                 setDrivePower(0);
                 break;
 
@@ -266,13 +267,13 @@ public class SkystoneHardware {
     }
 
 
-/*  Direction for diagonal movement (45 degree)
-    q2 | q1
-    -- + --
-    q3 | q4
- */
+    /*  Direction for diagonal movement (45 degree)
+        q2 | q1
+        -- + --
+        q3 | q4
+     */
     public void encoderDriveStrafe45(double speed,
-                                   double distance, String dir, double timeoutS) {
+                                     double distance, String dir, double timeoutS) {
         setDriveRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         int newLeftTargetFront;
         int newLeftTargetBack;
@@ -289,13 +290,13 @@ public class SkystoneHardware {
             if (dir.equals("q2")) {
                 leftDriveBack.setDirection(DcMotor.Direction.FORWARD);
                 rightDriveFront.setDirection(DcMotor.Direction.REVERSE);
-            }else if (dir.equals("q4")){
+            } else if (dir.equals("q4")) {
                 leftDriveBack.setDirection(DcMotor.Direction.REVERSE);
                 rightDriveFront.setDirection(DcMotor.Direction.FORWARD);
-            }else if (dir.equals("q1")) {
+            } else if (dir.equals("q1")) {
                 leftDriveFront.setDirection(DcMotor.Direction.FORWARD);
                 rightDriveBack.setDirection(DcMotor.Direction.REVERSE);
-            }else if (dir.equals("q3")){
+            } else if (dir.equals("q3")) {
                 leftDriveFront.setDirection(DcMotor.Direction.REVERSE);
                 rightDriveBack.setDirection(DcMotor.Direction.FORWARD);
             }
@@ -308,12 +309,12 @@ public class SkystoneHardware {
             setDriveRunMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // q2 and q4 use the same motors (similarly q1 and q3)
-            if(dir.equals("q2") || dir.equals("q4")){
+            if (dir.equals("q2") || dir.equals("q4")) {
                 leftDriveFront.setPower(Math.abs(0));
                 leftDriveBack.setPower(Math.abs(speed));
                 rightDriveFront.setPower(Math.abs(speed));
                 rightDriveBack.setPower(Math.abs(0));
-            }else {
+            } else {
                 leftDriveFront.setPower(Math.abs(speed));
                 leftDriveBack.setPower(Math.abs(0));
                 rightDriveFront.setPower(Math.abs(0));
@@ -325,8 +326,8 @@ public class SkystoneHardware {
             runtime.startTime();
             while (op_mode.opModeIsActive() &&
                     ((leftDriveBack.isBusy() && rightDriveFront.isBusy() && (dir.equals("q2") || dir.equals("q4")))
-                  || (leftDriveFront.isBusy() && rightDriveBack.isBusy() && (dir.equals("q1") || dir.equals("q3"))))
-                    && runtime.time()<timeoutS) {
+                            || (leftDriveFront.isBusy() && rightDriveBack.isBusy() && (dir.equals("q1") || dir.equals("q3"))))
+                    && runtime.time() < timeoutS) {
 
                 // Display it for the driver.
                 op_mode.telemetry.addData("Path_1", "Running to %7d :%7d: %7d :%7d",
@@ -352,45 +353,111 @@ public class SkystoneHardware {
 
     }
 
-
-    public void closeIntakeClaw(){
-        claw1.setPosition(0.45);
-        claw2.setPosition(0.5);
+    /*pos 1 is right
+      pos 2 is left
+      pos 3 is both
+    */
+    public void closeIntakeClaw(int pos) {
+        if (pos == 1) {
+            claw1.setPosition(0.45);
+        } else if (pos == 2) {
+            claw2.setPosition(0.5);
+        } else {
+            claw1.setPosition(0.45);
+            claw2.setPosition(0.5);
+        }
     }
-    public void openIntakeClaw(){
+
+    public void openIntakeClaw() {
         claw1.setPosition(0.75);
         claw2.setPosition(0.21);
+
     }
-    public void releaseIntakeClaw(){
+
+    public void releaseIntakeClaw() {
         claw1.setPosition(0.53);
         claw2.setPosition(0.43);
     }
-    public void openFlipperClaw()
-    {
+
+    public void openFlipperClaw() {
         leftClamp.setPosition(0.01);
         rightClamp.setPosition(0.21);
     }
-    public void closeFlipperClaw()
-    {
+
+    public void closeFlipperClaw() {
         leftClamp.setPosition(0.13);
         rightClamp.setPosition(0.07);
     }
-    public void frontFoundationClawUp()
-    {
+
+    public void frontFoundationClawUp() {
         rightFoundationClaw.setPosition(0.95);
         leftFoundationClaw.setPosition(0.8);
     }
-    public void frontFoundationClawDown()
-    {
+
+    public void frontFoundationClawDown() {
         rightFoundationClaw.setPosition(0.8);
         leftFoundationClaw.setPosition(0.95);
     }
-    public void backFoundationClawUp()
-    {
+
+    public void backFoundationClawUp() {
         backFoundationClaw.setPosition(0.1);
     }
+
     public void backFoundationClawDown() {
         backFoundationClaw.setPosition(0.3);
+    }
+
+    public void intakeArmDown() {
+        arm.setPower(-0.4);
+        op_mode.sleep(600);
+        arm.setPower(0);
+    }
+
+    public void intakeArmUp() {
+        while(touchSensor.getState()) {
+            arm.setPower(0.4);
+        }
+        arm.setPower(0);
+    }
+
+    public void grabStone(int pos, int forward, int backward) {
+        intakeArmDown();
+        op_mode.sleep(200);
+        openIntakeClaw();
+        encoderDrive(0.6, 0.6, forward, forward, 6);
+        closeIntakeClaw(pos);
+        op_mode.sleep(600);
+        intakeArmUp();
+        op_mode.sleep(1000);
+        encoderDrive(0.6, 0.6, -backward, -backward, 6);
+    }
+    public void dropStone(int forward, int backward){
+        encoderDrive(0.6, 0.6, forward, forward, 6);
+        intakeArmDown();
+        op_mode.sleep(600);
+        openIntakeClaw();
+        op_mode.sleep(500);
+        intakeArmUp();
+        op_mode.sleep(1000);
+        encoderDrive(0.6, 0.6, -backward, -backward, 6);
+    }
+    public void moveFoundation(String color){
+        frontFoundationClawUp();
+        encoderDrive(0.6, 0.6, 5, 5, 6);
+        frontFoundationClawDown();
+        op_mode.sleep(300);
+        encoderDrive(0.6, 0.6, -10, -10, 6);
+        if(color.equals("blue")) {
+            encoderDriveStrafe45(0.6, 30, "q4", 5);
+            encoderDrive(0.6, 0.6, -23, 23, 5);
+        }
+        else{
+            encoderDriveStrafe45(0.4, 30, "q3", 5);
+            encoderDrive(0.4, 0.4,23, -23, 5);
+        }
+        encoderDrive(0.6, 0.6, -20, -20, 2);
+        frontFoundationClawUp();
+        encoderDrive(0.8, 0.8, 45, 45, 4);
     }
 }
 
