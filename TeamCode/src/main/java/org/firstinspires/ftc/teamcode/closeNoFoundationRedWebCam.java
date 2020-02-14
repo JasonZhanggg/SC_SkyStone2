@@ -60,7 +60,7 @@ public class closeNoFoundationRedWebCam extends LinearOpMode {
         detector.init(hardwareMap, this);
         //wait for start
         waitForStart();
-        robot.openIntakeClaw();
+
         int blockNum = detector.getSkystone();
 
         if (blockNum == 1) {

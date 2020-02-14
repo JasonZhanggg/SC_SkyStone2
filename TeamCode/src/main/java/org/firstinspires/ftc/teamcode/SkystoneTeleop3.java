@@ -178,9 +178,9 @@ public class SkystoneTeleop3 extends LinearOpMode {
             telemetry.update();
 
             // ### Drive the robot
-            ch3 = gamepad1.left_stick_y > 0.4 ? -0.9 : gamepad1.left_stick_y < -0.4 ? 0.9 : 0;
-            ch4 = gamepad1.right_bumper ? 0.9 : gamepad1.left_bumper ? -0.9 : 0;
-            ch1 = gamepad1.right_stick_x > 0.4 ? 0.6 : gamepad1.right_stick_x < -0.4 ? -0.6 : 0;
+            ch3 = gamepad1.left_stick_y > 0.4 ? 0.9 : gamepad1.left_stick_y < -0.4 ? -0.9 : 0;
+            ch4 = gamepad1.right_bumper ? -0.9 : gamepad1.left_bumper ? 0.9 : 0;
+            ch1 = gamepad1.right_stick_x > 0.4 ? -0.6 : gamepad1.right_stick_x < -0.4 ? 0.6 : 0;
             robot.leftDriveFront.setPower((ch3 + ch1 + ch4) * speed);
             robot.leftDriveBack.setPower((ch3 + ch1 - ch4) * speed);
             robot.rightDriveFront.setPower((ch3 - ch1 - ch4) * speed);

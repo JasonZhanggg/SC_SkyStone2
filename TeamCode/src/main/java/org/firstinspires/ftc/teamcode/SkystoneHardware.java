@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
@@ -147,9 +148,11 @@ public class SkystoneHardware {
             rightDriveFront.setPower(Math.abs(speedRight));
             rightDriveBack.setPower(Math.abs(speedRight));
             while (op_mode.opModeIsActive() &&
-                    (leftDriveBack.isBusy() && rightDriveBack.isBusy() &&
-                            leftDriveFront.isBusy() && rightDriveFront.isBusy()) && runtime.time() < timeoutS) {
-
+                    Math.abs(leftDriveFront.getCurrentPosition()-newLeftTargetFront) > 50 &&
+                    Math.abs(leftDriveBack.getCurrentPosition()-newLeftTargetBack) > 50 &&
+                    Math.abs(rightDriveFront.getCurrentPosition()- newRightTargetFront) > 50 &&
+                    Math.abs(rightDriveBack.getCurrentPosition()-newRightTargetFront) > 50 &&
+                    runtime.time() < timeoutS) {
                 // Display it for the driver.
                 op_mode.telemetry.addData("Path_1", "Running to %7d :%7d: %7d :%7d",
                         newLeftTargetFront, newRightTargetFront, newLeftTargetBack, newRightTargetBack);
@@ -211,8 +214,11 @@ public class SkystoneHardware {
             runtime.reset();
             runtime.startTime();
             while (op_mode.opModeIsActive() &&
-                    (leftDriveBack.isBusy() && rightDriveBack.isBusy() &&
-                            leftDriveFront.isBusy() && rightDriveFront.isBusy()) && runtime.time() < timeoutS) {
+                    Math.abs(leftDriveFront.getCurrentPosition()-newLeftTargetFront) > 50 &&
+                    Math.abs(leftDriveBack.getCurrentPosition()-newLeftTargetBack) > 50 &&
+                    Math.abs(rightDriveFront.getCurrentPosition()- newRightTargetFront) > 50 &&
+                    Math.abs(rightDriveBack.getCurrentPosition()-newRightTargetFront) > 50 &&
+                    runtime.time() < timeoutS) {
 
                 // Display it for the driver.
                 op_mode.telemetry.addData("Path_1", "Running to %7d :%7d: %7d :%7d",
@@ -414,7 +420,7 @@ public class SkystoneHardware {
     }
 
     public void intakeArmUp() {
-        while(touchSensor.getState()) {
+        while (touchSensor.getState()) {
             arm.setPower(0.4);
         }
         arm.setPower(0);
@@ -424,36 +430,37 @@ public class SkystoneHardware {
         intakeArmDown();
         op_mode.sleep(200);
         openIntakeClaw();
-        encoderDrive(0.6, 0.6, forward, forward, 6);
+        encoderDrive(0.5, 0.5, forward, forward, 6);
         closeIntakeClaw(pos);
-        op_mode.sleep(600);
-        intakeArmUp();
-        op_mode.sleep(1000);
-        encoderDrive(0.6, 0.6, -backward, -backward, 6);
-    }
-    public void dropStone(int forward, int backward){
-        encoderDrive(0.6, 0.6, forward, forward, 6);
-        intakeArmDown();
-        op_mode.sleep(600);
-        openIntakeClaw();
         op_mode.sleep(500);
         intakeArmUp();
-        op_mode.sleep(1000);
-        encoderDrive(0.6, 0.6, -backward, -backward, 6);
+        encoderDrive(0.5, 0.5, -backward, -backward, 6);
     }
-    public void moveFoundation(String color){
+
+    public void dropStone(int forward, int backward) {
+        encoderDrive(0.5, 0.5, forward, forward, 1);
+        double inch = (0.393701)*rangeSensorR.getDistance(DistanceUnit.CM);
+        encoderDrive(0.5, 0.5, inch-2.5, inch-2.5, 5);
+        intakeArmDown();
+        op_mode.sleep(500);
+        releaseIntakeClaw();
+        op_mode.sleep(200);
+        intakeArmUp();
+        encoderDrive(0.5, 0.5, -backward, -backward, 6);
+    }
+
+    public void moveFoundation(String color) {
         frontFoundationClawUp();
         encoderDrive(0.6, 0.6, 5, 5, 6);
         frontFoundationClawDown();
         op_mode.sleep(300);
         encoderDrive(0.6, 0.6, -10, -10, 6);
-        if(color.equals("blue")) {
+        if (color.equals("blue")) {
             encoderDriveStrafe45(0.6, 30, "q4", 5);
             encoderDrive(0.6, 0.6, -23, 23, 5);
-        }
-        else{
+        } else {
             encoderDriveStrafe45(0.4, 30, "q3", 5);
-            encoderDrive(0.4, 0.4,23, -23, 5);
+            encoderDrive(0.4, 0.4, 23, -23, 5);
         }
         encoderDrive(0.6, 0.6, -20, -20, 2);
         frontFoundationClawUp();
